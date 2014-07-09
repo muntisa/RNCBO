@@ -50,26 +50,31 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
     sURL=sprintf("http://data.bioontology.org/recommender?text=%s&apikey=%s",URLencode(CurrTerm),apikey)
     CampaignJSON = getURL(sURL)
     cat(sURL,"\n")
-    res = NCBIRecommenderFromJSON(CurrTerm,CampaignJSON)
-    
-    # complete with the term URI in each recommended ontology
-    tURIs <- NULL    # list of term URIs
-    for (r in 1:dim(res)[1]) {
-      iOntology=res[r,3]
-      # ----------------------------------------------------------------------------------------------------
-      # GET URI for the term in this ontology
-      # ----------------------------------------------------------------------------------------------------
-      # Search one term into a specific ontology:
-      # ex: http://data.bioontology.org/search?q=nanoparticle&ontologies=NPO&exact_match=true
-      sURL2=sprintf("http://data.bioontology.org/search?q=%s&ontologies=%s&exact_match=true&apikey=%s",URLencode(CurrTerm),iOntology,apikey)
-      CampaignJSON2 = getURL(sURL2)
-      iURI=NCBIOgetURIsFromJSON(CurrTerm,iOntology,CampaignJSON2)
-      if (length(iURI) == 0){
-        iURI="ERROR!" # if there is no URI for a term into an ontology! Correcting the Recommender!
-      }
-      tURIs <- c(tURIs, iURI) # get term URI for all recommended ontologies
-    } 
-    dfResults <- rbind(dfResults,data.frame(res,Term_URI=tURIs)) # append the results to the final data frame
+    if (substr(CampaignJSON,1,4)=="<h1>") { # if the server has any other error
+      cat("Internal Server Error!!!", "\n")
+    } else {
+      res = NCBIRecommenderFromJSON(CurrTerm,CampaignJSON)
+      
+      # complete with the term URI in each recommended ontology
+      tURIs <- NULL    # list of term URIs
+      for (r in 1:dim(res)[1]) {
+        iOntology=res[r,3]
+        # ----------------------------------------------------------------------------------------------------
+        # GET URI for the term in this ontology
+        # ----------------------------------------------------------------------------------------------------
+        # Search one term into a specific ontology:
+        # ex: http://data.bioontology.org/search?q=nanoparticle&ontologies=NPO&exact_match=true
+        sURL2=sprintf("http://data.bioontology.org/search?q=%s&ontologies=%s&exact_match=true&apikey=%s",URLencode(CurrTerm),iOntology,apikey)
+        CampaignJSON2 = getURL(sURL2)
+        iURI=NCBIOgetURIsFromJSON(CurrTerm,iOntology,CampaignJSON2)
+        if (length(iURI) == 0){
+          iURI="ERROR!" # if there is no URI for a term into an ontology! Correcting the Recommender!
+        }
+        tURIs <- c(tURIs, iURI) # get term URI for all recommended ontologies
+      } 
+      dfResults <- rbind(dfResults,data.frame(res,Term_URI=tURIs)) # append the results to the final data frame
+
+    }  
     
   }
   dfFiltered = subset(dfResults, Term_URI !='ERROR!') # remove errors from the results
