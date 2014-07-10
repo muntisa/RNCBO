@@ -106,7 +106,7 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
 # PARAMETERS
 # ----------------------------------------------------------------------------------------------------
 
-apikey="d1f81232-5447-46af-ad13-6c9c9e5c1da8" # !!! ADD YOUR API KEY HERE !!!
+apikey="" # !!! ADD YOUR API KEY HERE !!!
 
 sTermFile   = "rBiOSS_Terms.csv"              # input files with the TERMS to map
 sResultFile = "rBiOSS_Results.csv"            # output file with the results
