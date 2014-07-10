@@ -52,6 +52,8 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
   # Process each term
   # ----------------------------------------------------------------------------------------------------
   for (t in 1:dim(dfTerms)[1]) {
+    dfFiltered <- NULL
+    dfResults <-NULL
     CurrTerm=as.character(dfTerms[t,1]) # current term to process
     cat("#",t,"from",dim(dfTerms)[1],":",CurrTerm,"\n")
     # ----------------------------------------------------------------------------------------------------
@@ -74,6 +76,7 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
         # Search one term into a specific ontology:
         # ex: http://data.bioontology.org/search?q=nanoparticle&ontologies=NPO&exact_match=true
         sURL2=sprintf("http://data.bioontology.org/search?q=%s&ontologies=%s&exact_match=true&apikey=%s",URLencode(CurrTerm),iOntology,apikey)
+        #cat(sURL2,"\n")
         CampaignJSON2 = getURL(sURL2)
         iURI=NCBIOgetURIsFromJSON(CurrTerm,iOntology,CampaignJSON2)
         if (length(iURI) == 0){
