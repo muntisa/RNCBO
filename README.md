@@ -3,11 +3,7 @@ RNCBO
 
 Mapping ontology terms using NCBO recommender
 
-by Cristian R Munteanu | muntisa [at] gmail [dot] com
-
-[BiGCaT] (http://www.bigcat.unimaas.nl/) - Maastricht University
-
-[eNanoMapper Project] (http://www.enanomapper.net/)
+by Cristian R Munteanu | muntisa [at] gmail [dot] com | [BiGCaT] (http://www.bigcat.unimaas.nl/) - Maastricht University |  [eNanoMapper Project] (http://www.enanomapper.net/)
 
 Thank you for the help of Marcos Martinez-Romero from University of Coruña, RNASA-IMEDIR group.
 
