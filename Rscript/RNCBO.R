@@ -42,13 +42,16 @@ NCBIRecommenderFromJSON <- function(sTerm,CampaignJSON) { # Get df with all onto
 }
 
 # ----------------------------------------------------------------------------------------------------
-NCBOmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using BiOSS recomender
+NCBOmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using NCBIO recomender
   # Read TERMS
   # -------------------------------------------------------------
   dfTerms=read.csv(sTermFile,header=F)       # read term file
+  dfTerms <- unique(dfTerms)                 # create unique list of the terms
   dfResults <- NULL                          # final results as data frame
   write(paste("Term","Score","Acronym","Ontology","Term_URI", sep=","), file=sResultFile, append=F) # create the result file with the header
   
+  sErrorFile = paste(sResultFile,"NotMapped.csv",sep="")    # create a name for the error file
+  write("NOT MAPPED", file=sErrorFile, append=F)            # create the error file with not mapped terms
   # Process each term
   # ----------------------------------------------------------------------------------------------------
   for (t in 1:dim(dfTerms)[1]) {
@@ -76,7 +79,7 @@ NCBOmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using BiO
         # Search one term into a specific ontology:
         # ex: http://data.bioontology.org/search?q=nanoparticle&ontologies=NPO&exact_match=true
         sURL2=sprintf("http://data.bioontology.org/search?q=%s&ontologies=%s&exact_match=true&apikey=%s",URLencode(CurrTerm),iOntology,apikey)
-        #cat(sURL2,"\n")
+        # cat(sURL2,"\n")
         CampaignJSON2 = getURL(sURL2)
         iURI=NCBIOgetURIsFromJSON(CurrTerm,iOntology,CampaignJSON2)
         if (length(iURI) == 0){
@@ -93,10 +96,11 @@ NCBOmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using BiO
       }
       else {
         cat("--> No mapping!\n")
+        write(CurrTerm, file=sErrorFile, append=T) # create the error file with not mapped terms
       }
     }
     else {
-      cat("--> BiOOS recommender error!\n")
+      cat("--> NCBO recommender error!\n")
     }
   }
 }
@@ -115,9 +119,15 @@ sTermFile   = "RNCBO_Terms.csv"              # input files with the TERMS to map
 sResultFile = "RNCBO_Results.csv"            # output file with the results
 
 cat("\n============================================================\n")
-cat("RNCBO - ontology Mapping using NCBO Recommender\n")
+cat("RNCBO - ontology Mapping using Bioportal Recommender\n")
 cat("============================================================\n")
 cat("by Cristian R Munteanu | muntisa [at] gmail [dot] com\n\n")
 cat("Running ... please wait ...\n")
+start.time <- Sys.time()                     # start registering the execution time
+
 NCBOmapper(sTermFile,sResultFile,apikey)     # mapping to ontology terms
-cat("\nDone!\n")
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+# cat("\nDone!\n\nExecution time:\n",time.taken,"sec\n", time.taken/60, "\tmins\n", time.taken/60/60, "\thours\n\n")
+cat(sprintf("\nDone!\n\nExecution time:\n %3.2f secs\n %3.2f mins\n %3.2f hours\n\n",time.taken,time.taken/60,time.taken/60/60))
