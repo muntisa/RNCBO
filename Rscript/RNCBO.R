@@ -1,4 +1,4 @@
-# rBiOSS - retrieve the URIs for terms using ontology recommenter REST API  from
+# RNCBO - retrieve the URIs for terms using ontology recommenter REST API  from
 # http://bioportal.bioontology.org/recommender
 # by Cristian R Munteanu | muntisa [at] gmail [dot] com
 # ----------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ NCBIRecommenderFromJSON <- function(sTerm,CampaignJSON) { # Get df with all onto
 }
 
 # ----------------------------------------------------------------------------------------------------
-BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using BiOSS recomender
+NCBOmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using BiOSS recomender
   # Read TERMS
   # -------------------------------------------------------------
   dfTerms=read.csv(sTermFile,header=F)       # read term file
@@ -111,13 +111,13 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
 
 apikey="" # !!! ADD YOUR API KEY HERE !!!
 
-sTermFile   = "rBiOSS_Terms.csv"              # input files with the TERMS to map
-sResultFile = "rBiOSS_Results.csv"            # output file with the results
+sTermFile   = "RNCBO_Terms.csv"              # input files with the TERMS to map
+sResultFile = "RNCBO_Results.csv"            # output file with the results
 
 cat("\n============================================================\n")
-cat("rBiOOS - ontology Mapping using Bioportal Recommender\n")
+cat("RNCBO - ontology Mapping using NCBO Recommender\n")
 cat("============================================================\n")
 cat("by Cristian R Munteanu | muntisa [at] gmail [dot] com\n\n")
 cat("Running ... please wait ...\n")
-BiOSSmapper(sTermFile,sResultFile,apikey)     # mapping to ontology terms
+NCBOmapper(sTermFile,sResultFile,apikey)     # mapping to ontology terms
 cat("\nDone!\n")
