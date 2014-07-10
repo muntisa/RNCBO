@@ -1,9 +1,11 @@
 # rBiOSS - retrieve the URIs for terms using ontology recommenter REST API  from
 # http://bioportal.bioontology.org/recommender
+# by Cristian R Munteanu | muntisa [at] gmail [dot] com
 # ----------------------------------------------------------------------------------------------------
 
 library(RCurl)
 library(rjson)
+library(stringr)
 
 # --------- FUNCTIONS --------------------------------------------------------------------------------
 NCBIOgetURIsFromJSON <- function(sTerm,sOntology,CampaignJSON) { # Get df with the URIs for {term, ontology}
@@ -21,14 +23,22 @@ NCBIRecommenderFromJSON <- function(sTerm,CampaignJSON) { # Get df with all onto
 
   JSONList <- fromJSON(CampaignJSON)
   results <- JSONList
-  for (i in 1:length(results)) {
-    terms <- c(terms,sTerm) # use the same term for all results 
-    scores <- c(scores, results[i][[1]]$score) # get score for each ontology
-    acronyms <- c(acronyms, results[i][[1]]$ontology$acronym) # get acronym for each ontology
-    oURIs <- c(oURIs, results[i][[1]]$ontology$links$ui) # get ontology URI for each ontology
-    RecomenderDF = data.frame(Term=terms,Score=scores,Ontology=acronyms,Ontology_URI=oURIs,stringsAsFactors=FALSE) # create a df from results
+  RecomenderDF <- NULL
+  
+  # CHECKING ERRORS !!!!
+  CollapseJSONList=as.character(paste(JSONList, collapse = '')[[1]])
+  if ( !is.null(JSONList) & CollapseJSONList != "") {    # if the JSON list is NULL
+    if ( grep("score",CollapseJSONList[[1]]) == 1 ){     # if there is any result and we can find "score" inside it
+      for (i in 1:length(results)) {                              # for each term in the REST result
+        terms <- c(terms,sTerm)                                    # use the same term for all results 
+        scores <- c(scores, results[i][[1]]$score)                 # get score for each ontology
+        acronyms <- c(acronyms, results[i][[1]]$ontology$acronym)  # get acronym for each ontology
+        oURIs <- c(oURIs, results[i][[1]]$ontology$links$ui)       # get ontology URI for each ontology
+        RecomenderDF = data.frame(Term=terms,Score=scores,Ontology=acronyms,Ontology_URI=oURIs,stringsAsFactors=FALSE) # create a df from results
+      } 
+    }
   }
-  return(RecomenderDF) # return a data frame with the results: Term, score, ontology acronym, URI
+  return(RecomenderDF) # return a data frame with the results: Term, score, ontology acronym, URI (if errors, it is NULL!!!)
 }
 
 # ----------------------------------------------------------------------------------------------------
@@ -36,13 +46,14 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
   # Read TERMS
   # -------------------------------------------------------------
   dfTerms=read.csv(sTermFile,header=F)       # read term file
-  dfResults <- NULL                            # final results as data frame
+  dfResults <- NULL                          # final results as data frame
+  write(paste("Term","Score","Acronym","Ontology","Term_URI", sep=","), file=sResultFile, append=F) # create the result file with the header
   
   # Process each term
   # ----------------------------------------------------------------------------------------------------
   for (t in 1:dim(dfTerms)[1]) {
     CurrTerm=as.character(dfTerms[t,1]) # current term to process
-    cat(t,"from",dim(dfTerms)[1],":",CurrTerm,"\n")
+    cat("#",t,"from",dim(dfTerms)[1],":",CurrTerm,"\n")
     # ----------------------------------------------------------------------------------------------------
     # Recommend the ontologies
     # ----------------------------------------------------------------------------------------------------
@@ -50,11 +61,9 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
     sURL=sprintf("http://data.bioontology.org/recommender?text=%s&apikey=%s",URLencode(CurrTerm),apikey)
     CampaignJSON = getURL(sURL)
     cat(sURL,"\n")
-    if (substr(CampaignJSON,1,4)=="<h1>") { # if the server has any other error
-      cat("Internal Server Error!!!", "\n")
-    } else {
-      res = NCBIRecommenderFromJSON(CurrTerm,CampaignJSON)
-      
+    
+    res = NCBIRecommenderFromJSON(CurrTerm,CampaignJSON) # get recommended ontologies from BiOSS
+    if ( !is.null(res) ) {                               # if there is a result from recommender (not NULL)
       # complete with the term URI in each recommended ontology
       tURIs <- NULL    # list of term URIs
       for (r in 1:dim(res)[1]) {
@@ -71,18 +80,23 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
           iURI="ERROR!" # if there is no URI for a term into an ontology! Correcting the Recommender!
         }
         tURIs <- c(tURIs, iURI) # get term URI for all recommended ontologies
-      } 
-      dfResults <- rbind(dfResults,data.frame(res,Term_URI=tURIs)) # append the results to the final data frame
-
-    }  
-    
+      }
+      
+      dfResults <- rbind(dfResults,data.frame(res,Term_URI=tURIs)) # append the results to the final data frame including errors
+      dfFiltered <- subset(dfResults, Term_URI !='ERROR!')         # filter the results
+      if ( dim(dfFiltered)[1] != 0 ){                              # if there is any result without ERRORS
+        write.table(dfFiltered, file=sResultFile, append=T, row.names=F, col.names=F,  sep=",") # append results for each term without errors!
+        cat(dim(dfFiltered)[1]," mappings\n")
+      }
+      else {
+        cat("--> No mapping!\n")
+      }
+    }
+    else {
+      cat("--> BiOOS recommender error!\n")
+    }
   }
-  dfFiltered = subset(dfResults, Term_URI !='ERROR!') # remove errors from the results
-  
-  # print(dfFiltered) # print on screen the final results
-  write.csv(dfFiltered, file = sResultFile) # write the filtered results into a file
 }
-
 
 #########################################################################################################
 # MAIN
@@ -92,11 +106,15 @@ BiOSSmapper <- function(sTermFile,sResultFile,apikey) { # Mapping terms using Bi
 # PARAMETERS
 # ----------------------------------------------------------------------------------------------------
 
-apikey="" # !!! ADD YOUR API KEY HERE !!!
+apikey="d1f81232-5447-46af-ad13-6c9c9e5c1da8" # !!! ADD YOUR API KEY HERE !!!
 
 sTermFile   = "rBiOSS_Terms.csv"              # input files with the TERMS to map
 sResultFile = "rBiOSS_Results.csv"            # output file with the results
 
-cat("rBiOSS running ... please wait ...")
+cat("\n============================================================\n")
+cat("rBiOOS - ontology Mapping using Bioportal Recommender\n")
+cat("============================================================\n")
+cat("by Cristian R Munteanu | muntisa [at] gmail [dot] com\n\n")
+cat("Running ... please wait ...\n")
 BiOSSmapper(sTermFile,sResultFile,apikey)     # mapping to ontology terms
-cat("Done!")
+cat("\nDone!\n")
