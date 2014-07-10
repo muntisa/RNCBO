@@ -8,3 +8,9 @@ The script is using RCurl and rjson in order to map a list of words to ontology 
 Addition error corrections should be included. The input and output files are CSV format.
 
 You should add your API KEY into the script in order obtain results!
+
+The script flow:
+- TERMS <- Input CSV file
+- Recommended ONTOLOGIES <- NCBIRecommenderFromJSON (ordered by score, filtered for errors)
+- URIs for TERMS<- NCBIOgetURIsFromJSON
+- Results as CSV: Term | Score | Acronym | Ontology | Term_URI
