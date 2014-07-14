@@ -17,3 +17,8 @@ The script flow:
 - URIs for TERMS<- NCBIOgetURIsFromJSON
 - CSV Results for mapped terms: Term | Score | Acronym | Ontology | Term_URI
 - CSV list with non mapped terms:: Terms
+
+
+Other details about the NCBO APIs: [http://data.bioontology.org/documentation] (http://data.bioontology.org/documentation)
+
+Other example using different languages (Python, Java, bash, etc.): [https://github.com/ncbo/ncbo_rest_sample_code] (https://github.com/ncbo/ncbo_rest_sample_code)
