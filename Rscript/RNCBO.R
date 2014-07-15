@@ -129,5 +129,4 @@ NCBOmapper(sTermFile,sResultFile,apikey)     # mapping to ontology terms
 
 end.time <- Sys.time()
 time.taken <- end.time - start.time
-# cat("\nDone!\n\nExecution time:\n",time.taken,"sec\n", time.taken/60, "\tmins\n", time.taken/60/60, "\thours\n\n")
 cat(sprintf("\nDone!\n\nExecution time:\n %3.2f secs\n %3.2f mins\n %3.2f hours\n\n",time.taken,time.taken/60,time.taken/60/60))
