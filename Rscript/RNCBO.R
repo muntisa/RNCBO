@@ -123,10 +123,5 @@ cat("RNCBO - ontology Mapping using Bioportal Recommender\n")
 cat("============================================================\n")
 cat("by Cristian R Munteanu | muntisa [at] gmail [dot] com\n\n")
 cat("Running ... please wait ...\n")
-start.time <- Sys.time()                     # start registering the execution time
-
-NCBOmapper(sTermFile,sResultFile,apikey)     # mapping to ontology terms
-
-end.time <- Sys.time()
-time.taken <- end.time - start.time
-cat(sprintf("\nDone!\n\nExecution time:\n %3.2f secs\n %3.2f mins\n %3.2f hours\n\n",time.taken,time.taken/60,time.taken/60/60))
+ 
+print(system.time(NCBOmapper(sTermFile,sResultFile,apikey))) # mapping to ontology terms 
