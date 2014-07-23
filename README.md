@@ -19,7 +19,7 @@ The script flow:
 
 Other details about the NCBO APIs: [http://data.bioontology.org/documentation] (http://data.bioontology.org/documentation)
 
-Other example using different languages (Python, Java, bash, etc.): [https://github.com/ncbo/ncbo_rest_sample_code] (https://github.com/ncbo/ncbo_rest_sample_code)
+Other example using different languages (Python, Java, bash, etc.): [https://github.com/ncbo/ncbo_rest_sample_code] (https://github.com/ncbo/ncbo_rest_sample_code). The recommender algorithm is presented into publication with [DOI: 10.1186/2041-1480-1-S1-S1] (http://www.ncbi.nlm.nih.gov/pubmed/20626921) (PMID: 20626921, PMCID: PMC2903720).
 
 
 Thank you for the help of Marcos Martinez-Romero from University of Coruña, RNASA-IMEDIR group.
