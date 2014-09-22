@@ -3,6 +3,7 @@
 # eNanoMapper Developers | enanomapper.net
 
 # Contact: muntisa [at] gmail [dot] com
+# RNASA-IMEDIR, University of A Coruna, Spain
 
 # Input file    = CSV one column list of terms to bne mapped
 # Output result = TAB-separated files with "Term","Score","Acronym","Ontology","ID","Notation","Description","Synonyms" for mapped terms
