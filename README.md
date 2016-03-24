@@ -16,7 +16,7 @@ The script flow:
 - CSV output with results for mapped terms: Term, Score, Acronym, Ontology, ID, Notation, Description, Synonyms
 - CSV list with non mapped terms
 
-The R files is presented with an example of terms and list of possible ontologies. Please check the main R script.
+The R script is presented with examples of files for terms and possible ontologies. Please check the main R script.
 
 Other details about the NCBO APIs: [http://data.bioontology.org/documentation] (http://data.bioontology.org/documentation)
 
